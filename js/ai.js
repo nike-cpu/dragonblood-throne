@@ -225,7 +225,8 @@
   function scoreUnitAttack(state, unit, targetUnit) {
     const atk = Engine.unitAtk(state, unit) + (Engine.hasRobe(unit) ? 0.5 : 0);
     const kills = atk >= targetUnit.def;
-    const retaliation = Engine.unitAtk(state, targetUnit);
+    const coveredByFront = unit.line === 'support' && Engine.hasBow(unit) && state.players[AI_SIDE].front.length > 0;
+    const retaliation = coveredByFront ? 0 : Engine.unitAtk(state, targetUnit);
     const iDie = retaliation >= unit.def;
 
     let s = 0;

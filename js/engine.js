@@ -874,14 +874,20 @@
       damageHQ(state, enemy, dmg, unit.name);
     } else if (targetUnit) {
       const retaliation = unitAtk(state, targetUnit);
+      const coveredByFront = unit.line === 'support' && hasBow(unit) && state.players[side].front.length > 0;
       addLog(state, `「${unit.name}」攻击「${targetUnit.name}」（${dmg} 点伤害）。`, side === 0 ? 'play-self' : 'play-enemy');
       damageUnit(state, targetUnit, dmg, unit.name);
       if (unit.cardId === 'fire_wyvern' && targetUnit.def > 0) {
         applyBurn(state, targetUnit, '火翼龙');
       }
       if (retaliation > 0) {
-        addLog(state, `「${targetUnit.name}」反击，对「${unit.name}」造成 ${retaliation} 点伤害。`, 'info');
-        damageUnit(state, unit, retaliation, targetUnit.name);
+        if (coveredByFront) {
+          emit(state, { t: 'cover', side, uid: unit.uid });
+          addLog(state, `己方前线有单位掩护，「${unit.name}」未受到反击。`, 'info');
+        } else {
+          addLog(state, `「${targetUnit.name}」反击，对「${unit.name}」造成 ${retaliation} 点伤害。`, 'info');
+          damageUnit(state, unit, retaliation, targetUnit.name);
+        }
       }
     }
 

@@ -340,6 +340,40 @@ test('弓箭：支援阵线的装备者可以攻击敌方两线单位，但不�
   assert(!targets.some(t => t.kind === 'hq'), '弓箭不能攻击总部');
 });
 
+test('弓箭：支援阵线攻击时，己方前线有单位则不受到反击', () => {
+  const s = fresh();
+  const hybrid = deploy(s, 0, 'hybrid_high'); // 3/3
+  s.active = 0; s.players[0].hand = ['bow']; s.players[0].crystals = 99;
+  let res = Engine.playCard(s, 0, 0, { kind: 'unit', side: 0, uid: hybrid.uid });
+  assert(res.ok, res.error);
+  const ownFront = deploy(s, 0, 'blue_dragon');
+  toFront(s, 0, ownFront.uid);
+  const enemy = deploy(s, 1, 'blue_dragon');
+  toFront(s, 1, enemy.uid);
+  setActive(s, 0); readyAll(s, 0);
+  hybrid.exhausted = false; hybrid.frozen = false;
+  const before = hybrid.def;
+  res = attack(s, 0, hybrid.uid, { kind: 'unit', side: 1, uid: enemy.uid });
+  assertEqual(hybrid.def, before, '前线有友军掩护时弓箭手不应受到反击');
+  assert(res.events.some(e => e.t === 'cover'), '应产生前线掩护事件');
+  assert(!s.log.some(l => l.text.includes('反击，对')), '战报不应出现反击伤害');
+});
+
+test('弓箭：支援阵线攻击时，己方前线为空仍会受到反击', () => {
+  const s = fresh();
+  const hybrid = deploy(s, 0, 'hybrid_high'); // 3/3
+  s.active = 0; s.players[0].hand = ['bow']; s.players[0].crystals = 99;
+  let res = Engine.playCard(s, 0, 0, { kind: 'unit', side: 0, uid: hybrid.uid });
+  assert(res.ok, res.error);
+  const enemy = deploy(s, 1, 'blue_dragon');
+  toFront(s, 1, enemy.uid);
+  setActive(s, 0); readyAll(s, 0);
+  hybrid.exhausted = false; hybrid.frozen = false;
+  res = attack(s, 0, hybrid.uid, { kind: 'unit', side: 1, uid: enemy.uid });
+  assertEqual(hybrid.def, 1, '没有前线掩护时应受到 2 点反击');
+  assert(s.log.some(l => l.text.includes('反击')), '战报应出现反击');
+});
+
 test('单位每回合只能攻击一次', () => {
   const s = fresh();
   const u = deploy(s, 0, 'red_dragon');

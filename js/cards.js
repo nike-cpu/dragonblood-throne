@@ -232,7 +232,7 @@
     {
       id: 'bow', name: '弓箭', en: 'Longbow', cost: 2, type: 'equip',
       rarity: 'rare', art: 'bow', accent: '#c9a15a',
-      text: '装备：装备者在支援阵线也可攻击敌方前线和支援阵线的单位。',
+      text: '装备：装备者在支援阵线也可攻击敌方前线和支援阵线的单位。若己方前线有单位，攻击时不受反击。',
       flavor: '射程之内，人人平等。',
       target: { who: 'ally', kind: 'equip', required: true, prompt: '装备给一个拥有装备槽的友方混血种' }
     },

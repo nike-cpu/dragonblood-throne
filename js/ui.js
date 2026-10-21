@@ -1148,7 +1148,7 @@
 
   const ANIM_EVENTS = {
     attack: 1, damage: 1, hqDamage: 1, hqHeal: 1, hqSet: 1, death: 1, deploy: 1, move: 1, freeze: 1, heal: 1,
-    buff: 1, equip: 1, exile: 1, burnApplied: 1, fatigue: 1, tactic: 1, turn: 1,
+    buff: 1, equip: 1, exile: 1, burnApplied: 1, fatigue: 1, tactic: 1, turn: 1, cover: 1,
     gameover: 1, draw: 1, overdraw: 1, thaw: 1, activate: 1
   };
 
@@ -1196,6 +1196,11 @@
         const el = document.querySelector('.unit[data-uid="' + ev.uid + '"]');
         shakeEl(el);
         return 180;
+      }
+      case 'cover': {
+        sfx('buff');
+        floatAt(ev.uid, '前线掩护', 'buff', snap);
+        return 220;
       }
       case 'hqDamage': {
         sfx('damage');
@@ -1585,10 +1590,10 @@
         '<h3>阵线与攻击</h3>' +
         '<ul>' +
           '<li><b>前线单位</b>可以攻击敌方前线单位；只有敌方前线没有单位时，才能攻击敌方总部与支援阵线。特殊技能/卡牌（如魔龙、快速取胜）可以直接对总部造成伤害，不受前线阻挡。</li>' +
-          '<li><b>支援阵线</b>单位通常无法攻击，但装备「弓箭」后可以攻击敌方两线的单位（不能攻击总部）。</li>' +
+          '<li><b>支援阵线</b>单位通常无法攻击，但装备「弓箭」后可以攻击敌方两线的单位（不能攻击总部）；若己方前线有单位，支援阵线的弓箭手攻击时不受反击。</li>' +
           '<li>只有位于<b>前线</b>的单位才能攻击总部；敌方前线存在单位时，普通攻击不能越过前线，也无法选中其支援阵线。特殊技能/卡牌可以直接伤害总部。</li>' +
           '<li>单位可以每回合从支援阵线移动到前线（移动不消耗攻击），之后仍可继续攻击。攻击后单位进入疲惫；移动本身不会使单位疲惫。</li>' +
-          '<li>战斗伤害同时结算：攻击者对目标造成攻击力伤害，目标也会对攻击者造成其攻击力的反击伤害。</li>' +
+          '<li>战斗伤害同时结算：攻击者对目标造成攻击力伤害，目标也会对攻击者造成其攻击力的反击伤害；装备弓箭的支援阵线单位在己方前线有单位时不受反击。</li>' +
         '</ul>' +
         '<h3>状态与关键词</h3>' +
         '<div class="rules-grid">' +
