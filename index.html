@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070910">
+  <meta name="description" content="龙裔王座：一款中世纪龙族主题的原创卡牌对战游戏。20 点总部生命、支援阵线与前线、39 张卡牌、装备与战术，挑战电脑对手。">
+  <title>龙裔王座 · Dragonblood Throne</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23070910'/%3E%3Ccircle cx='32' cy='32' r='26' fill='none' stroke='%23c9a24a' stroke-opacity='.5'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23e8c377' font-family='serif'%3E%E9%BE%99%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app" class="app">
+
+    <!-- ======================= 主菜单 ======================= -->
+    <section id="screen-title" class="screen title-screen active">
+      <div class="bg-veil"></div>
+      <div class="embers" id="title-embers"></div>
+      <div class="title-inner">
+        <div class="title-panel">
+          <p class="eyebrow"><i></i>A MEDIEVAL DRAGON CARD GAME<i></i></p>
+          <h1 class="game-title">
+            <span class="title-cn">龙裔<span class="gold">王座</span></span>
+            <span class="title-en">DRAGONBLOOD THRONE</span>
+          </h1>
+          <p class="tagline">龙晶燃起，前线列阵。<br>以血脉与王座之名，击破敌方总部。</p>
+          <div class="title-menu">
+            <button class="menu-btn primary" id="btn-play">
+              <span class="mb-cn">开始对战</span><span class="mb-en">PLAY</span>
+            </button>
+            <button class="menu-btn" id="btn-deckbuild">
+              <span class="mb-cn">卡组构筑</span><span class="mb-en">DECK BUILDER</span>
+            </button>
+            <button class="menu-btn" id="btn-codex">
+              <span class="mb-cn">卡牌图鉴</span><span class="mb-en">CARD CODEX</span>
+            </button>
+            <button class="menu-btn ghost" id="btn-rules">
+              <span class="mb-cn">规则说明</span><span class="mb-en">HOW TO PLAY</span>
+            </button>
+          </div>
+          <div class="title-footer">
+            <span class="tf-item">v1.0 · 原创单机卡牌对战</span>
+            <button class="tf-link" id="btn-sound">音效：开</button>
+            <span class="tf-item" id="title-record">战绩 0 胜 · 0 负</span>
+          </div>
+        </div>
+        <div class="title-art" id="title-art"></div>
+      </div>
+      <div class="title-corner tl"></div>
+      <div class="title-corner tr"></div>
+      <div class="title-corner bl"></div>
+      <div class="title-corner br"></div>
+    </section>
+
+    <!-- ======================= 对战 ======================= -->
+    <section id="screen-battle" class="screen battle-screen">
+      <div class="battle-shell">
+        <header class="hq-bar enemy-bar" id="enemy-hq-wrap">
+          <div class="hq-emblem" id="enemy-emblem"></div>
+          <div class="hq-main">
+            <div class="hq-title">
+              <span class="hq-name" id="enemy-name">对手</span>
+              <span class="hq-deck-name" id="enemy-deck-name"></span>
+            </div>
+            <div class="hp-track" id="enemy-hp-track">
+              <div class="hp-fill enemy" id="enemy-hp-fill"></div>
+              <div class="hp-text"><b id="enemy-hp">20</b><span> / 20</span></div>
+            </div>
+          </div>
+          <div class="hq-chips">
+            <span class="chip" title="手牌"><i class="chip-ico hand-ico"></i><b id="enemy-hand">4</b></span>
+            <span class="chip" title="卡组"><i class="chip-ico deck-ico"></i><b id="enemy-deck">25</b></span>
+            <span class="chip" title="龙晶"><i class="chip-ico crystal-ico"></i><b id="enemy-crystals">1</b><em>/10</em></span>
+          </div>
+          <div class="battle-tools">
+            <button class="icon-btn" id="btn-log-toggle" title="打开/收起战报">
+              <span class="ib-glyph">≡</span>
+            </button>
+            <button class="icon-btn" id="btn-battle-rules" title="规则说明">
+              <span class="ib-glyph">?</span>
+            </button>
+            <button class="icon-btn danger" id="btn-concede" title="投降">
+              <span class="ib-glyph">旗</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="battle-body">
+          <div class="board" id="board">
+            <div class="board-line enemy-side support-line" data-side="1" data-line="support">
+              <div class="line-tag"><span>支援阵线</span></div>
+              <div class="row" id="row-enemy-support"></div>
+            </div>
+            <div class="board-line enemy-side front-line" data-side="1" data-line="front">
+              <div class="line-tag"><span>前线</span></div>
+              <div class="row" id="row-enemy-front"></div>
+            </div>
+            <div class="frontline-divider">
+              <i></i><span>前 线</span><i></i>
+            </div>
+            <div class="board-line player-side front-line" data-side="0" data-line="front">
+              <div class="line-tag"><span>前线</span></div>
+              <div class="row" id="row-player-front"></div>
+            </div>
+            <div class="board-line player-side support-line" data-side="0" data-line="support">
+              <div class="line-tag"><span>支援阵线</span></div>
+              <div class="row" id="row-player-support"></div>
+            </div>
+          </div>
+
+          <aside class="log-panel" id="log-panel">
+            <div class="log-head">
+              <span>战 报</span>
+              <button class="log-close" id="btn-log-close" title="收起">×</button>
+            </div>
+            <div class="log-list" id="log-list"></div>
+          </aside>
+        </div>
+
+        <footer class="player-bar">
+          <div class="player-hq" id="player-hq-wrap">
+            <div class="hq-emblem small" id="player-emblem"></div>
+            <div class="hq-main">
+              <div class="hq-title">
+                <span class="hq-name">你的总部</span>
+                <span class="hq-deck-name" id="player-deck-name"></span>
+              </div>
+              <div class="hp-track">
+                <div class="hp-fill player" id="player-hp-fill"></div>
+                <div class="hp-text"><b id="player-hp">20</b><span> / 20</span></div>
+              </div>
+              <div class="player-meta">
+                <span class="chip" title="卡组"><i class="chip-ico deck-ico"></i><b id="player-deck">25</b></span>
+                <span class="chip" title="手牌"><i class="chip-ico hand-ico"></i><b id="player-hand">5</b><em>/10</em></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="crystal-zone" id="crystal-zone">
+            <div class="crystal-num"><b id="crystal-cur">1</b><span>/</span><em id="crystal-max">1</em></div>
+            <div class="crystal-dots" id="crystal-dots"></div>
+            <div class="crystal-label">龙晶</div>
+          </div>
+
+          <div class="hand-zone">
+            <div class="hand" id="hand"></div>
+            <div class="hand-hint" id="hand-hint">点击手牌以打出 · Esc 取消选择</div>
+          </div>
+
+          <div class="end-zone">
+            <div class="turn-indicator" id="turn-indicator">
+              <b id="turn-number">第 1 回合</b>
+              <span id="turn-owner">你的回合</span>
+            </div>
+            <button class="end-btn" id="btn-end-turn">
+              <span>结束回合</span><em>END TURN</em>
+            </button>
+            <button class="surrender-btn" id="btn-concede-bottom" title="认输并结束本局">投降</button>
+          </div>
+        </footer>
+
+        <div class="hint-bar" id="hint-bar"></div>
+        <div class="card-preview" id="card-preview"></div>
+        <div class="unit-menu" id="unit-menu"></div>
+        <div class="fx-layer" id="fx-layer"></div>
+        <div class="turn-flash" id="turn-flash"></div>
+      </div>
+    </section>
+
+    <!-- ======================= 卡组构筑 ======================= -->
+    <section id="screen-deckbuild" class="screen deck-screen">
+      <header class="deck-header">
+        <button class="text-btn" id="btn-deck-back">← 返回主菜单</button>
+        <div class="deck-heading">
+          <h2>卡组构筑</h2>
+          <p>从全卡池中挑选 30 张卡牌 · 同名最多 3 张 · 点击卡牌添加或移除</p>
+        </div>
+        <div class="deck-actions">
+          <button class="small-btn" id="btn-deck-clear">清空</button>
+          <button class="small-btn" id="btn-deck-presets">载入预设</button>
+          <button class="small-btn" id="btn-deck-save">保存卡组</button>
+          <button class="small-btn primary" id="btn-deck-fight">用此卡组对战</button>
+        </div>
+      </header>
+      <div class="deck-body">
+        <div class="deck-pool-wrap">
+          <div class="filters" id="deck-filters"></div>
+          <div class="deck-pool" id="deck-pool"></div>
+        </div>
+        <aside class="deck-side">
+          <div class="deck-side-head">
+            <div class="deck-count"><b id="deck-count">0</b><span>/30</span></div>
+            <div class="deck-side-info" id="deck-side-info">点击左侧卡牌加入卡组</div>
+          </div>
+          <div class="deck-curve" id="deck-curve"></div>
+          <div class="deck-list" id="deck-list"></div>
+          <div class="deck-msg" id="deck-msg"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 弹窗 / 提示 -->
+    <div class="modal-root" id="modal-root" aria-live="polite"></div>
+    <div class="toast-root" id="toast-root" aria-live="polite"></div>
+  </div>
+
+  <script src="js/cards.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
