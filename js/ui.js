@@ -637,6 +637,7 @@
       (sel.type === 'play' && sel.card.target && sel.card.target.required === false && sel.targets.length
         ? '<button class="hint-skip" data-hint-skip>跳过目标</button>'
         : '') +
+      (sel.type === 'attack' ? '<button class="hint-skip" data-hint-skip-attack>不攻击</button>' : '') +
       '<span class="hint-key">Esc 取消</span>';
     bar.classList.add('show');
   }
@@ -829,7 +830,7 @@
     runAction(() => Engine.moveUnit(ui.game, 0, uid), () => {
       const u = Engine.findUnit(ui.game, 0, uid);
       if (u && Engine.getAttackTargets(ui.game, 0, uid).length) {
-        toast('已移动到前线，可继续攻击', 'good');
+        toast('已移动到前线，可选择攻击或不攻击', 'good');
         selectAttack(uid);
       } else {
         toast('已移动到前线', 'info');
@@ -1592,7 +1593,7 @@
           '<li><b>前线单位</b>可以攻击敌方前线单位；只有敌方前线没有单位时，才能攻击敌方总部与支援阵线。特殊技能/卡牌（如魔龙、快速取胜）可以直接对总部造成伤害，不受前线阻挡。</li>' +
           '<li><b>支援阵线</b>单位通常无法攻击，但装备「弓箭」后可以攻击敌方两线的单位（不能攻击总部）；若己方前线有单位，支援阵线的弓箭手攻击时不受反击。</li>' +
           '<li>只有位于<b>前线</b>的单位才能攻击总部；敌方前线存在单位时，普通攻击不能越过前线，也无法选中其支援阵线。特殊技能/卡牌可以直接伤害总部。</li>' +
-          '<li>单位可以每回合从支援阵线移动到前线（移动不消耗攻击），之后仍可继续攻击。攻击后单位进入疲惫；移动本身不会使单位疲惫。</li>' +
+          '<li>单位可以每回合从支援阵线移动到前线（移动不消耗攻击），之后仍可继续攻击；也可以点击提示条上的「不攻击」结束行动。攻击后单位进入疲惫；移动本身不会使单位疲惫。</li>' +
           '<li>战斗伤害同时结算：攻击者对目标造成攻击力伤害，目标也会对攻击者造成其攻击力的反击伤害；装备弓箭的支援阵线单位在己方前线有单位时不受反击。</li>' +
         '</ul>' +
         '<h3>状态与关键词</h3>' +
@@ -1832,6 +1833,13 @@
     $('#enemy-hq-wrap').addEventListener('click', onEnemyHqClick);
     $('#unit-menu').addEventListener('click', onUnitMenuClick);
     $('#hint-bar').addEventListener('click', e => {
+      if (e.target.closest('[data-hint-skip-attack]')) {
+        if (ui.selection && ui.selection.type === 'attack') {
+          clearSelection();
+          toast('已跳过攻击，单位留在前线；再次点击单位仍可攻击', 'info');
+        }
+        return;
+      }
       if (!e.target.closest('[data-hint-skip]')) return;
       if (ui.selection && ui.selection.type === 'play' && ui.selection.card.target && ui.selection.card.target.required === false) {
         playSelected(null);
